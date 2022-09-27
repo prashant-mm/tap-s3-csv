@@ -94,6 +94,12 @@ def handle_file(config, s3_path, table_spec, stream, extension, file_handler = N
 
         # If file is extracted from zip or gz use file object else get file object from s3 bucket
         file_handle = file_handler if file_handler else s3.get_file_handle(config, s3_path)._raw_stream #pylint:disable=protected-access
+
+        headers = stream["schema"].get("headers", None)
+        if extension == 'txt' and headers:
+            headers = headers.replace('\n', '').encode()
+            file_handle = utils.FileHandleWrapper(file_handle, headers)
+
         return sync_csv_file(config, file_handle, s3_path, table_spec, stream)
 
     if extension == "jsonl":

@@ -1,5 +1,19 @@
 import gzip
 import struct
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass
+class FileHandleWrapper:
+    file_handle: Any
+    headers: Any
+
+    def __iter__(self):
+        yield self.headers
+
+        for line in self.file_handle:
+            yield line
 
 
 def get_file_name_from_gzfile(filename=None, fileobj=None):
